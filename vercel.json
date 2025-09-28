@@ -1,0 +1,5 @@
+{
+  "buildCommand": "npm run migrate:deploy",
+  "installCommand": "npm install",
+  "framework": "nextjs"
+} 
