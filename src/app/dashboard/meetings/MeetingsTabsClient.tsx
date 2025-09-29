@@ -87,25 +87,66 @@ export default function MeetingsTabsClient({ meetings, professors, students, eve
     function formatSlot(startStr?: string, endStr?: string) {
         if (!startStr || !endStr) return '';
 
-        // DEBUG: Log what we're getting from the database
-        console.log('🔍 DEBUG formatSlot - startStr:', startStr, 'endStr:', endStr);
-        console.log('🔍 DEBUG formatSlot - startStr type:', typeof startStr, 'endStr type:', typeof endStr);
+        // COMPREHENSIVE DEBUG: Let's trace the entire time conversion process
+        console.log('🔍 ===== TIME CONVERSION DEBUG START =====');
+        console.log('🔍 Raw database values:');
+        console.log('  - startStr:', startStr, '(type:', typeof startStr, ')');
+        console.log('  - endStr:', endStr, '(type:', typeof endStr, ')');
 
-        // Parse the dates and format them in Central Time
+        // Parse the dates
         const start = new Date(startStr);
         const end = new Date(endStr);
 
-        console.log('🔍 DEBUG formatSlot - parsed start:', start, 'parsed end:', end);
-        console.log('🔍 DEBUG formatSlot - start getHours():', start.getHours(), 'end getHours():', end.getHours());
+        console.log('🔍 After new Date() parsing:');
+        console.log('  - start:', start);
+        console.log('  - end:', end);
+        console.log('  - start.toISOString():', start.toISOString());
+        console.log('  - end.toISOString():', end.toISOString());
 
-        // Format times specifically in Central Time to avoid double conversion
-        const formatTime = (d: Date) => d.toLocaleTimeString('en-US', {
+        // Check timezone info
+        console.log('🔍 Timezone information:');
+        console.log('  - Browser timezone:', Intl.DateTimeFormat().resolvedOptions().timeZone);
+        console.log('  - start.getTimezoneOffset():', start.getTimezoneOffset());
+        console.log('  - end.getTimezoneOffset():', end.getTimezoneOffset());
+
+        // Test different formatting approaches
+        console.log('🔍 Different formatting approaches:');
+
+        // Approach 1: Direct local time
+        const localStart = start.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+        const localEnd = end.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+        console.log('  - Local time (no timezone):', `${localStart} - ${localEnd}`);
+
+        // Approach 2: Force Central Time
+        const centralStart = start.toLocaleTimeString('en-US', {
             hour: 'numeric',
             minute: '2-digit',
-            timeZone: 'America/Chicago' // Force Central Time display
+            timeZone: 'America/Chicago'
         });
-        const result = `${formatTime(start)} - ${formatTime(end)}`;
-        console.log('🔍 DEBUG formatSlot - final result:', result);
+        const centralEnd = end.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            timeZone: 'America/Chicago'
+        });
+        console.log('  - Central time (forced):', `${centralStart} - ${centralEnd}`);
+
+        // Approach 3: Manual timezone adjustment
+        const utcStart = new Date(start.getTime() + (start.getTimezoneOffset() * 60000));
+        const utcEnd = new Date(end.getTime() + (end.getTimezoneOffset() * 60000));
+        const manualStart = utcStart.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+        const manualEnd = utcEnd.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+        console.log('  - Manual UTC adjustment:', `${manualStart} - ${manualEnd}`);
+
+        // Approach 4: Parse as if it's already in Central Time
+        const startParts = startStr.split('T')[1]?.split(':') || [];
+        const endParts = endStr.split('T')[1]?.split(':') || [];
+        console.log('  - Raw time parts - start:', startParts, 'end:', endParts);
+
+        // Use the Central Time approach for now
+        const result = `${centralStart} - ${centralEnd}`;
+        console.log('🔍 Final result:', result);
+        console.log('🔍 ===== TIME CONVERSION DEBUG END =====');
+
         return result;
     }
 

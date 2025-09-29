@@ -19,6 +19,15 @@ export async function createMeeting(formData: FormData) {
         await client.connect();
 
         try {
+            // DEBUG: Log what we're storing to the database
+            console.log('🔍 ===== DATABASE STORAGE DEBUG =====');
+            console.log('🔍 Storing meeting to database:');
+            console.log('  - startTime (from form):', startTime, '(type:', typeof startTime, ')');
+            console.log('  - endTime (from form):', endTime, '(type:', typeof endTime, ')');
+            console.log('  - startTime parsed as Date:', new Date(startTime));
+            console.log('  - endTime parsed as Date:', new Date(endTime));
+            console.log('🔍 ===== DATABASE STORAGE DEBUG END =====');
+
             // Store times as-is in Central Time (no conversion)
             await client.query(
                 'INSERT INTO meetings (event_id, faculty_id, student_id, start_time, end_time, source) VALUES ($1, $2, $3, $4::timestamp, $5::timestamp, $6)',
