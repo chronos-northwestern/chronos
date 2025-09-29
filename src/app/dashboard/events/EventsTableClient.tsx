@@ -3,7 +3,6 @@ import React from 'react';
 import EventModalButton from '../EventModalButton';
 import EventModal from '../EventModal';
 import DeleteEventButton from './DeleteEventButton';
-import EventProgressStepper from './EventProgressStepper';
 import SmartActionButtons from './SmartActionButtons';
 import { getStatusInfo } from './EventStatusHelpers';
 import { updateEvent } from '../actions';
@@ -133,27 +132,19 @@ export default function EventsTableClient({ events }: { events: Event[] }) {
                 />
             )}
 
-            {/* Show progress stepper for individual events or general guidance */}
-            {events.length === 1 ? (
-                <EventProgressStepper
-                    currentStatus={events[0].status}
-                    eventName={events[0].name}
-                    eventDate={events[0].date}
-                />
-            ) : (
-                <div className="mb-6 p-4 bg-white border border-gray-200 rounded-lg">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">Event Workflow Stages</h3>
+            {/* Show general workflow guidance */}
+            <div className="mb-6 p-4 bg-white border border-gray-200 rounded-lg">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">Event Workflow Stages</h3>
 
-                    {/* Simple Text Flow */}
-                    <div className="text-center text-lg font-mono">
-                        Setup &nbsp;&nbsp; ➡️ &nbsp;&nbsp; Collecting Inputs &nbsp;&nbsp; ➡️ &nbsp;&nbsp; Generating Schedule &nbsp;&nbsp; ➡️ &nbsp;&nbsp; Published
-                    </div>
-                    <br />
-                    <div className="text-center text-xs text-gray-600">
-                        💡 Use smart action buttons to move between stages in any direction
-                    </div>
+                {/* Simple Text Flow */}
+                <div className="text-center text-lg font-mono">
+                    Setup &nbsp;&nbsp; ➡️ &nbsp;&nbsp; Collecting Inputs &nbsp;&nbsp; ➡️ &nbsp;&nbsp; Generating Schedule &nbsp;&nbsp; ➡️ &nbsp;&nbsp; Published
                 </div>
-            )}
+                <br />
+                <div className="text-center text-xs text-gray-600">
+                    💡 Use smart action buttons to move between stages in any direction
+                </div>
+            </div>
 
             {events.length === 0 ? (
                 <div>No events found or error loading events. Check server logs for details.</div>
