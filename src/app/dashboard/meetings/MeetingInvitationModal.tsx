@@ -125,7 +125,7 @@ export default function MeetingInvitationModal({ isOpen, onClose, meetings, even
         // We need to treat them as Central Time, not UTC
         let start: Date, end: Date;
 
-        if (startStr.includes('T') && startStr.includes('Z')) {
+        if (typeof startStr === 'string' && typeof endStr === 'string' && startStr.includes('T') && startStr.includes('Z')) {
             // If it's a UTC string from database, parse it as Central Time
             const centralStartStr = startStr.replace('Z', '');
             const centralEndStr = endStr.replace('Z', '');

@@ -60,7 +60,7 @@ export default function AddEditMeetingModal({
         // We need to treat them as Central Time, not UTC
         let date: Date;
 
-        if (dateTimeStr.includes('T') && dateTimeStr.includes('Z')) {
+        if (typeof dateTimeStr === 'string' && dateTimeStr.includes('T') && dateTimeStr.includes('Z')) {
             // If it's a UTC string from database, parse it as Central Time
             // Remove the 'Z' and treat as Central Time
             const centralTimeStr = dateTimeStr.replace('Z', '');

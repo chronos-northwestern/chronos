@@ -79,7 +79,7 @@ export default function MeetingsTabsClient({ meetings, professors, students, eve
         // We need to treat them as Central Time, not UTC
         let d: Date;
 
-        if (dateStr.includes('T') && dateStr.includes('Z')) {
+        if (typeof dateStr === 'string' && dateStr.includes('T') && dateStr.includes('Z')) {
             // If it's a UTC string from database, parse it as Central Time
             const centralTimeStr = dateStr.replace('Z', '');
             d = new Date(centralTimeStr);
@@ -101,7 +101,7 @@ export default function MeetingsTabsClient({ meetings, professors, students, eve
         // We need to treat them as Central Time, not UTC
         let start: Date, end: Date;
 
-        if (startStr.includes('T') && startStr.includes('Z')) {
+        if (typeof startStr === 'string' && typeof endStr === 'string' && startStr.includes('T') && startStr.includes('Z')) {
             // If it's a UTC string from database, parse it as Central Time
             const centralStartStr = startStr.replace('Z', '');
             const centralEndStr = endStr.replace('Z', '');
