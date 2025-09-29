@@ -87,16 +87,26 @@ export default function MeetingsTabsClient({ meetings, professors, students, eve
     function formatSlot(startStr?: string, endStr?: string) {
         if (!startStr || !endStr) return '';
 
-        // Simply parse the dates and format them
+        // DEBUG: Log what we're getting from the database
+        console.log('🔍 DEBUG formatSlot - startStr:', startStr, 'endStr:', endStr);
+        console.log('🔍 DEBUG formatSlot - startStr type:', typeof startStr, 'endStr type:', typeof endStr);
+
+        // Parse the dates and format them in Central Time
         const start = new Date(startStr);
         const end = new Date(endStr);
 
-        // Format times in local timezone (which should be Central Time)
+        console.log('🔍 DEBUG formatSlot - parsed start:', start, 'parsed end:', end);
+        console.log('🔍 DEBUG formatSlot - start getHours():', start.getHours(), 'end getHours():', end.getHours());
+
+        // Format times specifically in Central Time to avoid double conversion
         const formatTime = (d: Date) => d.toLocaleTimeString('en-US', {
             hour: 'numeric',
-            minute: '2-digit'
+            minute: '2-digit',
+            timeZone: 'America/Chicago' // Force Central Time display
         });
-        return `${formatTime(start)} - ${formatTime(end)}`;
+        const result = `${formatTime(start)} - ${formatTime(end)}`;
+        console.log('🔍 DEBUG formatSlot - final result:', result);
+        return result;
     }
 
     // Unique dates and slots for filters
