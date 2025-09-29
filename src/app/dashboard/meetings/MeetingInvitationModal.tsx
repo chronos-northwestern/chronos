@@ -121,16 +121,32 @@ export default function MeetingInvitationModal({ isOpen, onClose, meetings, even
     function formatSlot(startStr?: string, endStr?: string) {
         if (!startStr || !endStr) return '';
 
-        // Simply parse the dates and format them
+        // DEBUG: Show what we're working with
+        console.log('🔍 MeetingInvitation formatSlot - startStr:', startStr, 'endStr:', endStr);
+
+        // Parse the dates (these should be UTC from database)
         const start = new Date(startStr);
         const end = new Date(endStr);
 
-        const formatTime = (d: Date) => d.toLocaleTimeString('en-US', {
+        console.log('🔍 MeetingInvitation formatSlot - parsed start:', start, 'end:', end);
+
+        // Convert UTC to Central Time for display (same logic as main meetings display)
+        const centralStart = start.toLocaleTimeString('en-US', {
             hour: 'numeric',
             minute: '2-digit',
-            hour12: true
+            hour12: true,
+            timeZone: 'America/Chicago' // Convert UTC to Central Time
         });
-        return `${formatTime(start)} - ${formatTime(end)} CT`;
+        const centralEnd = end.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true,
+            timeZone: 'America/Chicago' // Convert UTC to Central Time
+        });
+
+        const result = `${centralStart} - ${centralEnd} CT`;
+        console.log('🔍 MeetingInvitation formatSlot - result:', result);
+        return result;
     }
 
     // Get published events with meetings
