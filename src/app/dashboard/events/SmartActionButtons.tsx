@@ -137,32 +137,32 @@ export default function SmartActionButtons({ event, onEdit, onDelete }: SmartAct
     function formatSlotsForAPI(availableSlots: string | undefined): string {
         if (!availableSlots) return '';
 
-        console.log('Original available_slots:', availableSlots);
+        console.log('🔍 Original available_slots:', availableSlots, 'Type:', typeof availableSlots);
 
         // If it's a string, try to parse as JSON
         if (typeof availableSlots === 'string') {
             try {
                 const parsed = JSON.parse(availableSlots);
-                console.log('Parsed JSON:', parsed);
+                console.log('🔍 Parsed JSON:', parsed);
 
                 if (Array.isArray(parsed)) {
                     const result = parsed.join(',');
-                    console.log('Formatted as array:', result);
+                    console.log('🔍 Formatted as array:', result);
                     return result;
                 } else if (parsed && typeof parsed === 'object' && Array.isArray(parsed.slots)) {
                     const result = parsed.slots.join(',');
-                    console.log('Formatted as object.slots:', result);
+                    console.log('🔍 Formatted as object.slots:', result);
                     return result;
                 }
             } catch {
                 // Not JSON, assume it's already comma-separated
-                console.log('Not JSON, using as-is:', availableSlots);
+                console.log('🔍 Not JSON, using as-is:', availableSlots);
                 return availableSlots;
             }
         }
 
         // Fallback
-        console.log('Fallback, using as-is:', availableSlots);
+        console.log('🔍 Fallback, using as-is:', availableSlots);
         return String(availableSlots);
     }
 
