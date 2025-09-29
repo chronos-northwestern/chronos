@@ -58,6 +58,39 @@ The application includes an automated migration system that:
 
 For detailed migration information, see [MIGRATION_README.md](./MIGRATION_README.md).
 
+## Environment Variables
+
+The following environment variables must be configured for deployment:
+
+### Required Environment Variables
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `NEON_POSTGRES_URL` | PostgreSQL database connection string | `postgresql://neondb_owner:npg_4cUo...@ep-xxx.us-east-1.aws.neon.tech/neondb?sslmode=require` |
+| `DEFAULT_USER_PASSWORD` | Default password for new users | `welcome123` |
+| `NODE_ENV` | Application environment | `production` |
+
+### Setting Up Environment Variables
+
+1. **For Vercel Deployment:**
+   - Go to your project dashboard on Vercel
+   - Navigate to Settings → Environment Variables
+   - Add each variable with its corresponding value
+
+2. **For Local Development:**
+   - Create a `.env.local` file in the project root
+   - Add the variables in the format: `VARIABLE_NAME=value`
+
+### Database Connection
+
+The `NEON_POSTGRES_URL` should be obtained from your Neon database dashboard. This connection string includes:
+- Database host and port
+- Username and password
+- Database name
+- SSL configuration
+
+⚠️ **Security Note**: Never commit environment variables to version control. Use your deployment platform's secure environment variable storage.
+
 ## Event Backend Integration
 
 - Events are managed via a RESTful API at `/api/events`.
