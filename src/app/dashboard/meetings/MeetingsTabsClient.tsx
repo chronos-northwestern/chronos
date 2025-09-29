@@ -138,13 +138,35 @@ export default function MeetingsTabsClient({ meetings, professors, students, eve
         console.log('  - Manual UTC adjustment:', `${manualStart} - ${manualEnd}`);
 
         // Approach 4: Parse as if it's already in Central Time
-        const startParts = startStr.split('T')[1]?.split(':') || [];
-        const endParts = endStr.split('T')[1]?.split(':') || [];
+        const startStrValue = typeof startStr === 'string' ? startStr : startStr?.toString();
+        const endStrValue = typeof endStr === 'string' ? endStr : endStr?.toString();
+        const startParts = startStrValue?.split('T')[1]?.split(':') || [];
+        const endParts = endStrValue?.split('T')[1]?.split(':') || [];
         console.log('  - Raw time parts - start:', startParts, 'end:', endParts);
 
-        // Use the Central Time approach for now
-        const result = `${centralStart} - ${centralEnd}`;
-        console.log('🔍 Final result:', result);
+        // The issue: Database times are in IST, but we need to display them as if they were Central Time
+        // Since the database stores IST times but we want to show them as Central Time,
+        // we need to treat the IST times as if they were Central Time
+
+        // Convert IST times to Central Time display
+        // IST is UTC+5:30, Central Time is UTC-6 (CST) or UTC-5 (CDT)
+        // So we need to subtract 11:30 hours (CST) or 10:30 hours (CDT) from IST
+
+        const istToCentralOffset = -11.5 * 60; // -11.5 hours in minutes (for CST)
+        const adjustedStart = new Date(start.getTime() + (istToCentralOffset * 60000));
+        const adjustedEnd = new Date(end.getTime() + (istToCentralOffset * 60000));
+
+        const finalStart = adjustedStart.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit'
+        });
+        const finalEnd = adjustedEnd.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit'
+        });
+
+        const result = `${finalStart} - ${finalEnd}`;
+        console.log('🔍 IST to Central conversion result:', result);
         console.log('🔍 ===== TIME CONVERSION DEBUG END =====');
 
         return result;
