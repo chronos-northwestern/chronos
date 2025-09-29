@@ -56,7 +56,16 @@ export default function AddEditMeetingModal({
     function formatDateTimeForInput(dateTimeStr?: string): string {
         if (!dateTimeStr) return '';
         const date = new Date(dateTimeStr);
-        return date.toISOString().slice(0, 16); // Format: YYYY-MM-DDTHH:MM
+
+        // Convert to Central Time for display in the input field
+        // Get the date components in Central Time
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
     }
 
     return (
