@@ -120,12 +120,27 @@ export default function MeetingInvitationModal({ isOpen, onClose, meetings, even
 
     function formatSlot(startStr?: string, endStr?: string) {
         if (!startStr || !endStr) return '';
-        const start = new Date(startStr);
-        const end = new Date(endStr);
+
+        // The database stores times in Central Time, but PostgreSQL returns them as UTC strings
+        // We need to treat them as Central Time, not UTC
+        let start: Date, end: Date;
+
+        if (startStr.includes('T') && startStr.includes('Z')) {
+            // If it's a UTC string from database, parse it as Central Time
+            const centralStartStr = startStr.replace('Z', '');
+            const centralEndStr = endStr.replace('Z', '');
+            start = new Date(centralStartStr);
+            end = new Date(centralEndStr);
+        } else {
+            start = new Date(startStr);
+            end = new Date(endStr);
+        }
+
         const formatTime = (d: Date) => d.toLocaleTimeString('en-US', {
             hour: 'numeric',
             minute: '2-digit',
-            hour12: true
+            hour12: true,
+            timeZone: 'America/Chicago' // Force Central Time
         });
         return `${formatTime(start)} - ${formatTime(end)} CT`;
     }
