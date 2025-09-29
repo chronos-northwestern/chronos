@@ -73,19 +73,6 @@ async function getMeetings(user: User, latestRunId: number | null) {
         `);
     }
     await client.end();
-
-    // DEBUG: Log raw database values to understand what we're getting
-    console.log('🔍 ===== DATABASE RETRIEVAL DEBUG =====');
-    if (result.rows.length > 0) {
-        const sampleRow = result.rows[0];
-        console.log('🔍 Sample meeting from database:');
-        console.log('  - start_time (raw):', sampleRow.start_time, '(type:', typeof sampleRow.start_time, ')');
-        console.log('  - end_time (raw):', sampleRow.end_time, '(type:', typeof sampleRow.end_time, ')');
-        console.log('  - start_time toString():', sampleRow.start_time?.toString());
-        console.log('  - end_time toString():', sampleRow.end_time?.toString());
-    }
-    console.log('🔍 ===== DATABASE RETRIEVAL DEBUG END =====');
-
     return result.rows.map(row => ({
         ...row,
         professor_id: row.faculty_id, // for compatibility with frontend

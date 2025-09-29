@@ -87,7 +87,7 @@ export default function MeetingsTabsClient({ meetings, professors, students, eve
     function formatSlot(startStr?: string, endStr?: string) {
         if (!startStr || !endStr) return '';
 
-        // COMPREHENSIVE DEBUG: Let's trace the entire time conversion process
+        // DEBUG: Show what we're working with
         console.log('🔍 ===== TIME CONVERSION DEBUG START =====');
         console.log('🔍 Raw database values:');
         console.log('  - startStr:', startStr, '(type:', typeof startStr, ')');
@@ -103,70 +103,21 @@ export default function MeetingsTabsClient({ meetings, professors, students, eve
         console.log('  - start.toISOString():', start.toISOString());
         console.log('  - end.toISOString():', end.toISOString());
 
-        // Check timezone info
-        console.log('🔍 Timezone information:');
-        console.log('  - Browser timezone:', Intl.DateTimeFormat().resolvedOptions().timeZone);
-        console.log('  - start.getTimezoneOffset():', start.getTimezoneOffset());
-        console.log('  - end.getTimezoneOffset():', end.getTimezoneOffset());
-
-        // Test different formatting approaches
-        console.log('🔍 Different formatting approaches:');
-
-        // Approach 1: Direct local time
-        const localStart = start.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-        const localEnd = end.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-        console.log('  - Local time (no timezone):', `${localStart} - ${localEnd}`);
-
-        // Approach 2: Force Central Time
+        // SOLUTION: Always treat times as Central Time regardless of user's actual timezone
+        // Force display in Central Time by using timeZone: 'America/Chicago'
         const centralStart = start.toLocaleTimeString('en-US', {
             hour: 'numeric',
             minute: '2-digit',
-            timeZone: 'America/Chicago'
+            timeZone: 'America/Chicago' // Force Central Time display
         });
         const centralEnd = end.toLocaleTimeString('en-US', {
             hour: 'numeric',
             minute: '2-digit',
-            timeZone: 'America/Chicago'
-        });
-        console.log('  - Central time (forced):', `${centralStart} - ${centralEnd}`);
-
-        // Approach 3: Manual timezone adjustment
-        const utcStart = new Date(start.getTime() + (start.getTimezoneOffset() * 60000));
-        const utcEnd = new Date(end.getTime() + (end.getTimezoneOffset() * 60000));
-        const manualStart = utcStart.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-        const manualEnd = utcEnd.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-        console.log('  - Manual UTC adjustment:', `${manualStart} - ${manualEnd}`);
-
-        // Approach 4: Parse as if it's already in Central Time
-        const startStrValue = typeof startStr === 'string' ? startStr : startStr?.toString();
-        const endStrValue = typeof endStr === 'string' ? endStr : endStr?.toString();
-        const startParts = startStrValue?.split('T')[1]?.split(':') || [];
-        const endParts = endStrValue?.split('T')[1]?.split(':') || [];
-        console.log('  - Raw time parts - start:', startParts, 'end:', endParts);
-
-        // The issue: Database times are in IST, but we need to display them as if they were Central Time
-        // Since the database stores IST times but we want to show them as Central Time,
-        // we need to treat the IST times as if they were Central Time
-
-        // Convert IST times to Central Time display
-        // IST is UTC+5:30, Central Time is UTC-6 (CST) or UTC-5 (CDT)
-        // So we need to subtract 11:30 hours (CST) or 10:30 hours (CDT) from IST
-
-        const istToCentralOffset = -11.5 * 60; // -11.5 hours in minutes (for CST)
-        const adjustedStart = new Date(start.getTime() + (istToCentralOffset * 60000));
-        const adjustedEnd = new Date(end.getTime() + (istToCentralOffset * 60000));
-
-        const finalStart = adjustedStart.toLocaleTimeString('en-US', {
-            hour: 'numeric',
-            minute: '2-digit'
-        });
-        const finalEnd = adjustedEnd.toLocaleTimeString('en-US', {
-            hour: 'numeric',
-            minute: '2-digit'
+            timeZone: 'America/Chicago' // Force Central Time display
         });
 
-        const result = `${finalStart} - ${finalEnd}`;
-        console.log('🔍 IST to Central conversion result:', result);
+        const result = `${centralStart} - ${centralEnd}`;
+        console.log('🔍 Central Time result (forced):', result);
         console.log('🔍 ===== TIME CONVERSION DEBUG END =====');
 
         return result;
