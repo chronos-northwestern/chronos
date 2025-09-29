@@ -56,20 +56,11 @@ export default function AddEditMeetingModal({
     function formatDateTimeForInput(dateTimeStr?: string): string {
         if (!dateTimeStr) return '';
 
-        // The database stores times in Central Time, but PostgreSQL returns them as UTC strings
-        // We need to treat them as Central Time, not UTC
-        let date: Date;
+        // Simply parse the date and format it for the input field
+        // The database stores Central Time, so we just need to display it correctly
+        const date = new Date(dateTimeStr);
 
-        if (typeof dateTimeStr === 'string' && dateTimeStr.includes('T') && dateTimeStr.includes('Z')) {
-            // If it's a UTC string from database, parse it as Central Time
-            // Remove the 'Z' and treat as Central Time
-            const centralTimeStr = dateTimeStr.replace('Z', '');
-            date = new Date(centralTimeStr);
-        } else {
-            date = new Date(dateTimeStr);
-        }
-
-        // Get the date components (already in Central Time)
+        // Get the date components in the local timezone
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');

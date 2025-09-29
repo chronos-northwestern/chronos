@@ -75,48 +75,26 @@ export default function MeetingsTabsClient({ meetings, professors, students, eve
     function formatDate(dateStr?: string) {
         if (!dateStr) return '';
 
-        // The database stores times in Central Time, but PostgreSQL returns them as UTC strings
-        // We need to treat them as Central Time, not UTC
-        let d: Date;
-
-        if (typeof dateStr === 'string' && dateStr.includes('T') && dateStr.includes('Z')) {
-            // If it's a UTC string from database, parse it as Central Time
-            const centralTimeStr = dateStr.replace('Z', '');
-            d = new Date(centralTimeStr);
-        } else {
-            d = new Date(dateStr);
-        }
+        // Simply parse the date and format it
+        const d = new Date(dateStr);
 
         return d.toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'short',
-            day: '2-digit',
-            timeZone: 'America/Chicago' // Force Central Time
+            day: '2-digit'
         });
     }
     function formatSlot(startStr?: string, endStr?: string) {
         if (!startStr || !endStr) return '';
 
-        // The database stores times in Central Time, but PostgreSQL returns them as UTC strings
-        // We need to treat them as Central Time, not UTC
-        let start: Date, end: Date;
+        // Simply parse the dates and format them
+        const start = new Date(startStr);
+        const end = new Date(endStr);
 
-        if (typeof startStr === 'string' && typeof endStr === 'string' && startStr.includes('T') && startStr.includes('Z')) {
-            // If it's a UTC string from database, parse it as Central Time
-            const centralStartStr = startStr.replace('Z', '');
-            const centralEndStr = endStr.replace('Z', '');
-            start = new Date(centralStartStr);
-            end = new Date(centralEndStr);
-        } else {
-            start = new Date(startStr);
-            end = new Date(endStr);
-        }
-
-        // Format times in Central Time
+        // Format times in local timezone (which should be Central Time)
         const formatTime = (d: Date) => d.toLocaleTimeString('en-US', {
             hour: 'numeric',
-            minute: '2-digit',
-            timeZone: 'America/Chicago' // Force Central Time
+            minute: '2-digit'
         });
         return `${formatTime(start)} - ${formatTime(end)}`;
     }
