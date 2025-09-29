@@ -37,7 +37,6 @@ export default function EventProgressStepper({ currentStatus, eventName, eventDa
                 {steps.map((step, index) => {
                     const isCompleted = index < currentIndex;
                     const isCurrent = index === currentIndex;
-                    const isUpcoming = index > currentIndex;
 
                     return (
                         <React.Fragment key={step.key}>

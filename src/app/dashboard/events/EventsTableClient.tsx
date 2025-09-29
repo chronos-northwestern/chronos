@@ -18,32 +18,14 @@ interface Event {
     created_at: string;
     start_time?: string;
     end_time?: string;
-    available_slots?: unknown;
+    available_slots?: string;
     min_faculty?: number;
     max_faculty?: number;
 }
 
-// Helper function to extract minPreferences from available_slots JSON
-function extractMinPreferences(availableSlots: unknown): number {
-    if (!availableSlots) return 1;
-    try {
-        if (typeof availableSlots === 'string') {
-            const parsed = JSON.parse(availableSlots);
-            if (parsed && typeof parsed === 'object' && typeof (parsed as { minPreferences?: unknown }).minPreferences === 'number') {
-                return (parsed as { minPreferences: number }).minPreferences;
-            }
-        } else if (typeof availableSlots === 'object' && availableSlots !== null) {
-            const maybe = availableSlots as { minPreferences?: unknown };
-            if (typeof maybe.minPreferences === 'number') return maybe.minPreferences;
-        }
-    } catch {
-        // ignore and use default
-    }
-    return 1;
-}
 
 // Helper function to extract slots from available_slots in any supported shape
-function extractSlots(availableSlots: unknown): string[] {
+function extractSlots(availableSlots: string | undefined): string[] {
     if (!availableSlots) return [];
 
     // Already an array (from server normalization)
@@ -82,7 +64,7 @@ function extractSlots(availableSlots: unknown): string[] {
 }
 
 // Helper: format sessions to a comma-separated string regardless of input shape
-function formatSessionsDisplay(availableSlots: unknown): string {
+function formatSessionsDisplay(availableSlots: string | undefined): string {
     const slots = extractSlots(availableSlots);
     if (slots.length > 0) return slots.join(', ');
 
@@ -228,9 +210,8 @@ export default function EventsTableClient({ events }: { events: Event[] }) {
                                 dateForEdit = event.date || '';
                             }
 
-                            // Extract slots and minPreferences for display and editing
+                            // Extract slots for display and editing
                             const slots = extractSlots(event.available_slots);
-                            const minPrefs = extractMinPreferences(event.available_slots);
                             const slotsForEdit = slots.join(', ');
                             const sessionsDisplay = formatSessionsDisplay(event.available_slots);
 

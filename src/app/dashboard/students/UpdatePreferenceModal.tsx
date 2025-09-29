@@ -115,8 +115,9 @@ export default function UpdatePreferenceModal({ isOpen, onClose, student }: Prop
                     }
                 } else if (typeof ev.available_slots === 'object' && ev.available_slots !== null) {
                     // Handle case where available_slots is already a parsed object
-                    if (Array.isArray((ev.available_slots as any).slots)) {
-                        ranges = (ev.available_slots as any).slots;
+                    const slotsObj = ev.available_slots as { slots?: string[] };
+                    if (Array.isArray(slotsObj.slots)) {
+                        ranges = slotsObj.slots;
                     }
                 } else if (Array.isArray(ev.available_slots)) {
                     // Handle case where available_slots is already an array (legacy format)

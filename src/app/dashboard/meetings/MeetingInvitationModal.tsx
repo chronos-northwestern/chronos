@@ -11,9 +11,9 @@ interface Meeting {
     student_id: string;
     student_name: string;
     student_email: string;
-    start_time: string;
-    end_time: string;
-    run_id: number;
+    start_time?: string;
+    end_time?: string;
+    run_id?: number;
 }
 
 interface Event {
@@ -47,12 +47,8 @@ export default function MeetingInvitationModal({ isOpen, onClose, meetings, even
             // Handle different date formats
             let dateToFormat;
 
-            // If it's already a Date object
-            if (dateStr instanceof Date) {
-                dateToFormat = dateStr;
-            }
             // If it's a string, try to parse it
-            else if (typeof dateStr === 'string') {
+            if (typeof dateStr === 'string') {
                 // Handle YYYY-MM-DD format specifically
                 if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
                     dateToFormat = new Date(dateStr + 'T00:00:00');
@@ -93,9 +89,7 @@ export default function MeetingInvitationModal({ isOpen, onClose, meetings, even
         try {
             let dateToFormat;
 
-            if (dateStr instanceof Date) {
-                dateToFormat = dateStr;
-            } else if (typeof dateStr === 'string') {
+            if (typeof dateStr === 'string') {
                 if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
                     dateToFormat = new Date(dateStr + 'T00:00:00');
                 } else {
@@ -196,7 +190,11 @@ export default function MeetingInvitationModal({ isOpen, onClose, meetings, even
         Object.entries(facultyGroups).forEach(([professorName, professorMeetings]) => {
             facultyContent += `${professorName}:\n`;
             professorMeetings
-                .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())
+                .sort((a, b) => {
+                    const aTime = a.start_time ? new Date(a.start_time).getTime() : 0;
+                    const bTime = b.start_time ? new Date(b.start_time).getTime() : 0;
+                    return aTime - bTime;
+                })
                 .forEach(meeting => {
                     facultyContent += `• ${formatSlot(meeting.start_time, meeting.end_time)}: ${meeting.student_name}\n`;
                 });
@@ -218,7 +216,11 @@ export default function MeetingInvitationModal({ isOpen, onClose, meetings, even
         attendeeContent += `Your meeting for ${selectedEvent.name} on ${bodyDate} has been scheduled:\n\n`;
 
         eventMeetings
-            .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())
+            .sort((a, b) => {
+                const aTime = a.start_time ? new Date(a.start_time).getTime() : 0;
+                const bTime = b.start_time ? new Date(b.start_time).getTime() : 0;
+                return aTime - bTime;
+            })
             .forEach(meeting => {
                 attendeeContent += `• ${meeting.student_name}: ${formatSlot(meeting.start_time, meeting.end_time)} with ${meeting.faculty_name}\n`;
             });
@@ -391,7 +393,7 @@ export default function MeetingInvitationModal({ isOpen, onClose, meetings, even
                     <strong>📋 How to use:</strong>
                     <ol className="mt-2 ml-4 list-decimal space-y-1">
                         <li>Select an event from the dropdown above</li>
-                        <li>Click "📋 Copy Faculty Email" or "📋 Copy Attendee Email"</li>
+                        <li>Click &quot;📋 Copy Faculty Email&quot; or &quot;📋 Copy Attendee Email&quot;</li>
                         <li>Open Outlook and create a new email</li>
                         <li>Paste (Ctrl+V) - Outlook will auto-fill subject and recipients</li>
                         <li>Review and click Send!</li>

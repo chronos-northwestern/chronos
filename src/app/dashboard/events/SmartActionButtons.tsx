@@ -134,24 +134,10 @@ export default function SmartActionButtons({ event, onEdit, onDelete }: SmartAct
     const router = useRouter();
 
     // Helper function to extract slots and format them for API
-    function formatSlotsForAPI(availableSlots: any): string {
+    function formatSlotsForAPI(availableSlots: string | undefined): string {
         if (!availableSlots) return '';
 
         console.log('Original available_slots:', availableSlots);
-
-        // If it's already an object with slots property
-        if (typeof availableSlots === 'object' && availableSlots !== null && Array.isArray(availableSlots.slots)) {
-            const result = availableSlots.slots.join(', ');
-            console.log('Formatted from object.slots:', result);
-            return result;
-        }
-
-        // If it's already an array
-        if (Array.isArray(availableSlots)) {
-            const result = availableSlots.join(', ');
-            console.log('Formatted from array:', result);
-            return result;
-        }
 
         // If it's a string, try to parse as JSON
         if (typeof availableSlots === 'string') {
