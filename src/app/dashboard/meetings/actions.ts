@@ -2,6 +2,17 @@
 import { Client } from 'pg';
 import { revalidatePath } from 'next/cache';
 
+// Helper function to get Central Time offset in minutes (handles DST)
+function getCentralTimeOffset(date: Date): number {
+    // Create a date in Central Time to get the correct offset
+    const centralTime = new Date(date.toLocaleString("en-US", { timeZone: "America/Chicago" }));
+    const utcTime = new Date(date.toLocaleString("en-US", { timeZone: "UTC" }));
+
+    // Calculate the offset in minutes
+    const offsetMs = centralTime.getTime() - utcTime.getTime();
+    return Math.round(offsetMs / (1000 * 60));
+}
+
 export async function createMeeting(formData: FormData) {
     try {
         const eventId = formData.get('event_id') as string;
@@ -21,13 +32,22 @@ export async function createMeeting(formData: FormData) {
         try {
             // Convert Central Time input to UTC for database storage
             // The form provides times in Central Time, but we need to store them as UTC
-            const startTimeUTC = new Date(startTime + ' America/Chicago').toISOString();
-            const endTimeUTC = new Date(endTime + ' America/Chicago').toISOString();
-
             console.log('🔍 Converting Central Time to UTC for storage:');
             console.log('  - startTime (CT):', startTime);
-            console.log('  - startTime (UTC):', startTimeUTC);
             console.log('  - endTime (CT):', endTime);
+
+            // Parse the datetime-local input (format: YYYY-MM-DDTHH:MM)
+            const startDate = new Date(startTime);
+            const endDate = new Date(endTime);
+
+            // Get the correct Central Time offset (handles DST)
+            const centralOffset = getCentralTimeOffset(startDate);
+
+            // Convert to UTC by adding the Central Time offset
+            const startTimeUTC = new Date(startDate.getTime() + (centralOffset * 60000)).toISOString();
+            const endTimeUTC = new Date(endDate.getTime() + (centralOffset * 60000)).toISOString();
+
+            console.log('  - startTime (UTC):', startTimeUTC);
             console.log('  - endTime (UTC):', endTimeUTC);
 
             await client.query(
@@ -64,8 +84,15 @@ export async function updateMeeting(formData: FormData) {
 
         try {
             // Convert Central Time input to UTC for database storage
-            const startTimeUTC = new Date(startTime + ' America/Chicago').toISOString();
-            const endTimeUTC = new Date(endTime + ' America/Chicago').toISOString();
+            const startDate = new Date(startTime);
+            const endDate = new Date(endTime);
+
+            // Get the correct Central Time offset (handles DST)
+            const centralOffset = getCentralTimeOffset(startDate);
+
+            // Convert to UTC by adding the Central Time offset
+            const startTimeUTC = new Date(startDate.getTime() + (centralOffset * 60000)).toISOString();
+            const endTimeUTC = new Date(endDate.getTime() + (centralOffset * 60000)).toISOString();
 
             await client.query(
                 'UPDATE meetings SET event_id = $1, faculty_id = $2, student_id = $3, start_time = $4::timestamp with time zone, end_time = $5::timestamp with time zone WHERE id = $6',

@@ -2,6 +2,17 @@
 import { ScheduledMeeting } from './IMatchingAlgorithm';
 import { Client } from 'pg';
 
+// Helper function to get Central Time offset in minutes (handles DST)
+function getCentralTimeOffset(date: Date): number {
+    // Create a date in Central Time to get the correct offset
+    const centralTime = new Date(date.toLocaleString("en-US", { timeZone: "America/Chicago" }));
+    const utcTime = new Date(date.toLocaleString("en-US", { timeZone: "UTC" }));
+
+    // Calculate the offset in minutes
+    const offsetMs = centralTime.getTime() - utcTime.getTime();
+    return Math.round(offsetMs / (1000 * 60));
+}
+
 export async function saveMeetings(meetings: ScheduledMeeting[], runId: number) {
     if (!meetings.length) return;
     const eventId = meetings[0].eventId;
@@ -42,16 +53,34 @@ export async function saveMeetings(meetings: ScheduledMeeting[], runId: number) 
                 : '';
         const { eventDateStr: parsedEventDate, startTime, endTime } = parseSlotToTimestamps(eventDateStr, m.slot);
 
-        // Convert Central Time to UTC for database storage
+        // Convert Central Time to UTC for database storage (handles DST automatically)
+        // The scheduler generates times in Central Time, we need to convert to UTC
         const centralTimeStart = `${parsedEventDate} ${startTime}:00`;
         const centralTimeEnd = `${parsedEventDate} ${endTime}:00`;
 
-        // Convert to UTC for proper storage
-        const startTimeUTC = new Date(centralTimeStart + ' America/Chicago').toISOString();
-        const endTimeUTC = new Date(centralTimeEnd + ' America/Chicago').toISOString();
-
         console.log(`[DEBUG] Converting Central Time to UTC for storage:`);
         console.log(`  - Central Time: ${centralTimeStart} - ${centralTimeEnd}`);
+
+        // Use JavaScript's built-in timezone handling to properly handle DST
+        // Create a date string that JavaScript can parse as Central Time
+        const startDateStr = `${parsedEventDate}T${startTime}:00`;
+        const endDateStr = `${parsedEventDate}T${endTime}:00`;
+
+        // Create Date objects and let JavaScript handle the timezone conversion
+        // We'll treat the input as if it's in Central Time and convert to UTC
+        const startDate = new Date(startDateStr);
+        const endDate = new Date(endDateStr);
+
+        // Get the timezone offset for Central Time on this date
+        // Create a temporary date in Central Time to get the correct offset
+        const tempDate = new Date(startDateStr);
+        const centralOffset = getCentralTimeOffset(tempDate);
+
+        // Convert to UTC by adding the Central Time offset
+        const startTimeUTC = new Date(startDate.getTime() + (centralOffset * 60000)).toISOString();
+        const endTimeUTC = new Date(endDate.getTime() + (centralOffset * 60000)).toISOString();
+
+        console.log(`  - Central offset (minutes): ${centralOffset}`);
         console.log(`  - UTC: ${startTimeUTC} - ${endTimeUTC}`);
 
         await client.query(
