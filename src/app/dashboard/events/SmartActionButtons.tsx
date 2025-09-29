@@ -146,11 +146,11 @@ export default function SmartActionButtons({ event, onEdit, onDelete }: SmartAct
                 console.log('Parsed JSON:', parsed);
 
                 if (Array.isArray(parsed)) {
-                    const result = parsed.join(', ');
+                    const result = parsed.join(',');
                     console.log('Formatted as array:', result);
                     return result;
                 } else if (parsed && typeof parsed === 'object' && Array.isArray(parsed.slots)) {
-                    const result = parsed.slots.join(', ');
+                    const result = parsed.slots.join(',');
                     console.log('Formatted as object.slots:', result);
                     return result;
                 }
