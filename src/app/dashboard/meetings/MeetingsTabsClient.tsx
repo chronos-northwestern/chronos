@@ -93,7 +93,7 @@ export default function MeetingsTabsClient({ meetings, professors, students, eve
         console.log('  - startStr:', startStr, '(type:', typeof startStr, ')');
         console.log('  - endStr:', endStr, '(type:', typeof endStr, ')');
 
-        // Parse the dates
+        // Parse the dates (these should now be UTC from database)
         const start = new Date(startStr);
         const end = new Date(endStr);
 
@@ -103,21 +103,20 @@ export default function MeetingsTabsClient({ meetings, professors, students, eve
         console.log('  - start.toISOString():', start.toISOString());
         console.log('  - end.toISOString():', end.toISOString());
 
-        // SOLUTION: Always treat times as Central Time regardless of user's actual timezone
-        // Force display in Central Time by using timeZone: 'America/Chicago'
+        // SOLUTION: Database now stores UTC, convert to Central Time for display
         const centralStart = start.toLocaleTimeString('en-US', {
             hour: 'numeric',
             minute: '2-digit',
-            timeZone: 'America/Chicago' // Force Central Time display
+            timeZone: 'America/Chicago' // Convert UTC to Central Time
         });
         const centralEnd = end.toLocaleTimeString('en-US', {
             hour: 'numeric',
             minute: '2-digit',
-            timeZone: 'America/Chicago' // Force Central Time display
+            timeZone: 'America/Chicago' // Convert UTC to Central Time
         });
 
         const result = `${centralStart} - ${centralEnd}`;
-        console.log('🔍 Central Time result (forced):', result);
+        console.log('🔍 UTC to Central Time result:', result);
         console.log('🔍 ===== TIME CONVERSION DEBUG END =====');
 
         return result;

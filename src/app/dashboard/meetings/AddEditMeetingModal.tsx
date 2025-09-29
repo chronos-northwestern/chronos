@@ -60,19 +60,27 @@ export default function AddEditMeetingModal({
         console.log('🔍 DEBUG formatDateTimeForInput - dateTimeStr:', dateTimeStr);
         console.log('🔍 DEBUG formatDateTimeForInput - type:', typeof dateTimeStr);
 
-        // Parse the date and format it for the input field in Central Time
+        // Parse the date (should be UTC from database)
         const date = new Date(dateTimeStr);
 
         console.log('🔍 DEBUG formatDateTimeForInput - parsed date:', date);
-        console.log('🔍 DEBUG formatDateTimeForInput - getHours():', date.getHours(), 'getMinutes():', date.getMinutes());
+        console.log('🔍 DEBUG formatDateTimeForInput - toISOString():', date.toISOString());
 
-        // Get the date components in Central Time to avoid timezone conversion issues
-        const centralDate = new Date(date.toLocaleString("en-US", { timeZone: "America/Chicago" }));
-        const year = centralDate.getFullYear();
-        const month = String(centralDate.getMonth() + 1).padStart(2, '0');
-        const day = String(centralDate.getDate()).padStart(2, '0');
-        const hours = String(centralDate.getHours()).padStart(2, '0');
-        const minutes = String(centralDate.getMinutes()).padStart(2, '0');
+        // Convert UTC to Central Time for the input field
+        const centralTimeString = date.toLocaleString("en-US", {
+            timeZone: "America/Chicago",
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+        });
+
+        // Parse the Central Time string to get components
+        const [datePart, timePart] = centralTimeString.split(', ');
+        const [month, day, year] = datePart.split('/');
+        const [hours, minutes] = timePart.split(':');
 
         const result = `${year}-${month}-${day}T${hours}:${minutes}`;
         console.log('🔍 DEBUG formatDateTimeForInput - final result:', result);

@@ -19,10 +19,20 @@ export async function createMeeting(formData: FormData) {
         await client.connect();
 
         try {
-            // Store times as-is in Central Time (no conversion)
+            // Convert Central Time input to UTC for database storage
+            // The form provides times in Central Time, but we need to store them as UTC
+            const startTimeUTC = new Date(startTime + ' America/Chicago').toISOString();
+            const endTimeUTC = new Date(endTime + ' America/Chicago').toISOString();
+
+            console.log('🔍 Converting Central Time to UTC for storage:');
+            console.log('  - startTime (CT):', startTime);
+            console.log('  - startTime (UTC):', startTimeUTC);
+            console.log('  - endTime (CT):', endTime);
+            console.log('  - endTime (UTC):', endTimeUTC);
+
             await client.query(
-                'INSERT INTO meetings (event_id, faculty_id, student_id, start_time, end_time, source) VALUES ($1, $2, $3, $4::timestamp, $5::timestamp, $6)',
-                [eventId, facultyId, studentId, startTime, endTime, source]
+                'INSERT INTO meetings (event_id, faculty_id, student_id, start_time, end_time, source) VALUES ($1, $2, $3, $4::timestamp with time zone, $5::timestamp with time zone, $6)',
+                [eventId, facultyId, studentId, startTimeUTC, endTimeUTC, source]
             );
         } finally {
             await client.end();
@@ -53,9 +63,13 @@ export async function updateMeeting(formData: FormData) {
         await client.connect();
 
         try {
+            // Convert Central Time input to UTC for database storage
+            const startTimeUTC = new Date(startTime + ' America/Chicago').toISOString();
+            const endTimeUTC = new Date(endTime + ' America/Chicago').toISOString();
+
             await client.query(
-                'UPDATE meetings SET event_id = $1, faculty_id = $2, student_id = $3, start_time = $4, end_time = $5 WHERE id = $6',
-                [eventId, facultyId, studentId, startTime, endTime, id]
+                'UPDATE meetings SET event_id = $1, faculty_id = $2, student_id = $3, start_time = $4::timestamp with time zone, end_time = $5::timestamp with time zone WHERE id = $6',
+                [eventId, facultyId, studentId, startTimeUTC, endTimeUTC, id]
             );
         } finally {
             await client.end();

@@ -42,16 +42,21 @@ export async function saveMeetings(meetings: ScheduledMeeting[], runId: number) 
                 : '';
         const { eventDateStr: parsedEventDate, startTime, endTime } = parseSlotToTimestamps(eventDateStr, m.slot);
 
-        // Store timestamps as-is in Central Time (no timezone conversion)
-        // What you see in the UI is exactly what's stored in the database
-        const starts_at_sql = `${parsedEventDate} ${startTime}:00`;
-        const ends_at_sql = `${parsedEventDate} ${endTime}:00`;
+        // Convert Central Time to UTC for database storage
+        const centralTimeStart = `${parsedEventDate} ${startTime}:00`;
+        const centralTimeEnd = `${parsedEventDate} ${endTime}:00`;
 
-        console.log(`[DEBUG] Storing to database (Central Time): starts_at=${starts_at_sql}, ends_at=${ends_at_sql}`);
+        // Convert to UTC for proper storage
+        const startTimeUTC = new Date(centralTimeStart + ' America/Chicago').toISOString();
+        const endTimeUTC = new Date(centralTimeEnd + ' America/Chicago').toISOString();
+
+        console.log(`[DEBUG] Converting Central Time to UTC for storage:`);
+        console.log(`  - Central Time: ${centralTimeStart} - ${centralTimeEnd}`);
+        console.log(`  - UTC: ${startTimeUTC} - ${endTimeUTC}`);
 
         await client.query(
-            'INSERT INTO meetings (event_id, faculty_id, student_id, start_time, end_time, source, run_id) VALUES ($1, $2, $3, $4::timestamp, $5::timestamp, $6, $7)',
-            [m.eventId, m.professorId, m.studentId, starts_at_sql, ends_at_sql, 'AUTO', runId]
+            'INSERT INTO meetings (event_id, faculty_id, student_id, start_time, end_time, source, run_id) VALUES ($1, $2, $3, $4::timestamp with time zone, $5::timestamp with time zone, $6, $7)',
+            [m.eventId, m.professorId, m.studentId, startTimeUTC, endTimeUTC, 'AUTO', runId]
         );
     }
     await client.end();
