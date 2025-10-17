@@ -20,3 +20,8 @@ Fixed
 - Programmer Manual
 - User Manual
 
+Project Report
+- Insert Diagrams
+- Thanking note to IT Team, Prof Samir, Ms Agaton
+- Insert Screenshot of pages
+- Simplify migration
