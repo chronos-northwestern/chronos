@@ -3,9 +3,9 @@
 
 ---
 
-**Intern Name:** [Your Name]  
+**Intern Name:** Arnav Panda  
 **Organization:** Northwestern University  
-**Project Duration:** [Start Date] - [End Date]  
+**Project Duration:** June 2025 - October 2025  
 **Submission Date:** October 11, 2025  
 **Project Repository:** Chronos - Academic Scheduling System
 
@@ -33,7 +33,7 @@
 
 **Chronos** is a comprehensive academic meeting scheduling system designed to optimize and automate the complex process of coordinating student-faculty meetings. The system addresses the challenge of efficiently matching hundreds of students with faculty members while respecting time constraints, availability, and preferences.
 
-The application serves as a centralized platform for managing academic events, collecting availability data from faculty, gathering student preferences, and automatically generating optimal meeting schedules using a custom-built integer programming algorithm.
+The application serves as a centralized platform for managing academic events, collecting availability data from faculty, gathering student preferences, and automatically generating optimal meeting schedules using a custom-built integer programming algorithm. The system has been designed with a generic architecture that can also accommodate non-student attendees for various meeting scenarios.
 
 ### Key Achievements
 
@@ -70,7 +70,7 @@ The application serves as a centralized platform for managing academic events, c
 
 ### 2.1 Problem Statement
 
-Academic institutions frequently organize events requiring one-on-one meetings between students and faculty members, such as:
+Northwestern University frequently organizes events requiring one-on-one meetings between students and faculty members, such as:
 - Graduate program interviews
 - Academic advising sessions
 - Research collaboration meetings
@@ -80,7 +80,7 @@ Academic institutions frequently organize events requiring one-on-one meetings b
 
 Coordinating these meetings manually is extremely time-consuming and suboptimal. Key problems include:
 
-1. **Complexity**: With 50 students, 20 faculty, and 30 time slots, there are potentially millions of possible schedules
+1. **Complexity**: With approximately 50 students, 40 faculty, and 30 time slots, there are potentially millions of possible schedules
 2. **Constraint Management**: Must respect faculty availability, student preferences, and time conflicts
 3. **Preference Optimization**: Students have ranked preferences that should be respected
 4. **Time Investment**: Manual scheduling can take days or weeks
@@ -125,11 +125,10 @@ The primary objectives of the Chronos project were:
 - **Maintainability**: Clean, documented code following best practices
 
 **Out of Scope:**
-- Email notifications (planned for future)
-- Calendar integration (planned for future)
+- Automated Email notifications
+- Calendar integration
 - Mobile native application
 - Video conferencing integration
-- Payment processing
 
 ### 2.4 Target Users and Use Cases
 
@@ -159,6 +158,16 @@ The primary objectives of the Chronos project were:
    - View assigned meetings
    - Access personal schedule
 
+**Role-Based User Interfaces:**
+
+![Faculty Dashboard](./screenshots/faculty-dashboard.png)
+*Figure 7: Faculty dashboard showing availability management interface with event selection and time slot configuration*
+
+![Student Dashboard](./screenshots/student-dashboard.png)
+*Figure 8: Student dashboard displaying preference submission interface with faculty ranking and availability selection*
+
+The system provides tailored interfaces for each user role, ensuring that users only see relevant functionality and can efficiently complete their tasks without confusion.
+
 **Primary Use Cases:**
 
 | **Actor** | **Use Case** | **Description** |
@@ -178,49 +187,8 @@ The primary objectives of the Chronos project were:
 
 Chronos follows a modern **full-stack architecture** built on the Next.js framework, leveraging both server-side rendering (SSR) and client-side interactivity.
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                     CLIENT LAYER                        │
-│  ┌──────────────────────────────────────────────────┐  │
-│  │  React Components (Client & Server Components)   │  │
-│  │  - Authentication UI                              │  │
-│  │  - Dashboard Pages                                │  │
-│  │  - Modal Forms                                     │  │
-│  │  - Data Tables                                     │  │
-│  └──────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────┘
-                          ↕ HTTP/HTTPS
-┌─────────────────────────────────────────────────────────┐
-│                   APPLICATION LAYER                     │
-│  ┌──────────────────────────────────────────────────┐  │
-│  │  Next.js API Routes                               │  │
-│  │  - /api/auth/*      (Authentication)              │  │
-│  │  - /api/events/*    (Event Management)            │  │
-│  │  - Server Actions   (Data Operations)             │  │
-│  └──────────────────────────────────────────────────┘  │
-│  ┌──────────────────────────────────────────────────┐  │
-│  │  Business Logic                                   │  │
-│  │  - Scheduling Algorithms                          │  │
-│  │  - Data Validation                                │  │
-│  │  - Authorization Logic                            │  │
-│  └──────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────┘
-                          ↕ SQL Queries
-┌─────────────────────────────────────────────────────────┐
-│                     DATA LAYER                          │
-│  ┌──────────────────────────────────────────────────┐  │
-│  │  PostgreSQL Database (Neon)                       │  │
-│  │  - Users, Events, Meetings                        │  │
-│  │  - Availabilities, Preferences                    │  │
-│  │  - Scheduler Runs                                  │  │
-│  └──────────────────────────────────────────────────┘  │
-│  ┌──────────────────────────────────────────────────┐  │
-│  │  Migration System                                 │  │
-│  │  - Schema Management                              │  │
-│  │  - Version Tracking                               │  │
-│  └──────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────┘
-```
+![System Architecture Diagram](./screenshots/system-architecture-diagram.png)
+*Figure 9: High-level system architecture showing layered design with client, application, and data layers*
 
 **Architectural Patterns:**
 - **Server-Side Rendering (SSR)**: Fast initial page loads, SEO-friendly
@@ -273,34 +241,10 @@ Chronos follows a modern **full-stack architecture** built on the Next.js framew
 
 **Entity-Relationship Model:**
 
-```
-┌─────────────┐       ┌─────────────┐       ┌─────────────┐
-│    USERS    │       │   EVENTS    │       │  MEETINGS   │
-├─────────────┤       ├─────────────┤       ├─────────────┤
-│ id (PK)     │───┐   │ id (PK)     │   ┌──│ id (PK)     │
-│ name        │   │   │ name        │   │  │ event_id    │
-│ email       │   │   │ date        │   │  │ faculty_id  │
-│ department  │   │   │ slot_len    │   │  │ student_id  │
-│ role        │   │   │ status      │   │  │ start_time  │
-│ status      │   │   │ start_time  │   │  │ end_time    │
-│ password    │   │   │ end_time    │   │  │ source      │
-│ created_at  │   │   │ slots       │   │  │ run_id      │
-└─────────────┘   │   └─────────────┘   │  └─────────────┘
-                  │           │          │
-                  │   ┌───────┴────┐     │
-                  │   │            │     │
-                  ↓   ↓            ↓     ↓
-        ┌──────────────────┐   ┌──────────────────┐
-        │ AVAILABILITIES   │   │   PREFERENCES    │
-        ├──────────────────┤   ├──────────────────┤
-        │ id (PK)          │   │ id (PK)          │
-        │ faculty_id (FK)  │   │ student_id (FK)  │
-        │ event_id (FK)    │   │ event_id (FK)    │
-        │ available_slots  │   │ professor_ids    │
-        │ preferences      │   │ available_slots  │
-        │ updated_at       │   │ updated_at       │
-        └──────────────────┘   └──────────────────┘
-```
+![Entity Relationship Model](./screenshots/entity-relationship-model.png)
+*Figure 10: Entity-Relationship diagram showing database schema with table relationships and constraints*
+
+The database schema implements a normalized design with clear separation of concerns and referential integrity.
 
 **Key Design Decisions:**
 
@@ -362,6 +306,13 @@ Chronos follows a modern **full-stack architecture** built on the Next.js framew
 - Professional, academic aesthetic
 - Clean, modern interface
 
+**Authentication Interface:**
+
+![Login Page](./screenshots/login-page.png)
+*Figure 1: Clean, professional login interface with Northwestern University branding*
+
+The authentication system provides a streamlined entry point with clear visual hierarchy and consistent branding elements.
+
 **Key UI Components:**
 
 1. **Authentication Pages**
@@ -375,6 +326,13 @@ Chronos follows a modern **full-stack architecture** built on the Next.js framew
    - Role-specific menu items
    - Breadcrumb navigation
    - User info and logout in header
+
+**Admin Dashboard Interface:**
+
+![Admin Dashboard](./screenshots/admin-dashboard-events.png)
+*Figure 2: Admin dashboard showing events management with comprehensive table view and navigation*
+
+The admin dashboard provides a centralized interface for managing all system components with clear data presentation and intuitive navigation controls.
 
 3. **Data Tables**
    - Sortable columns
@@ -565,6 +523,11 @@ A revolutionary status management system that guides users through the workflow 
 - Future stages shown in gray
 - Contextual help text for each stage
 
+![Smart Status Transitions](./screenshots/smart-status-transitions.png)
+*Figure 3: Smart Status Transition system showing visual progress stepper and context-aware action buttons*
+
+The Smart Status Transition system eliminates confusion by providing clear visual guidance and intelligent warnings for each workflow step.
+
 **Status Workflow:**
 
 ```
@@ -611,7 +574,7 @@ System automatically generates appropriate warnings:
 **The Scheduling Challenge:**
 
 Matching students with faculty is a complex **combinatorial optimization problem**:
-- 50 students × 20 faculty × 30 slots = 30,000 possible combinations
+- 50 students × 40 faculty × 30 slots = 60,000 possible combinations
 - Must respect constraints (no double-booking)
 - Should optimize preferences (student satisfaction)
 - Needs to scale efficiently
@@ -678,6 +641,11 @@ The system supports multiple algorithms:
 
 Admins can choose based on problem characteristics.
 
+![Scheduler Interface](./screenshots/scheduler-interface.png)
+*Figure 4: Scheduler interface showing algorithm selection and execution controls*
+
+The scheduler interface provides administrators with full control over the scheduling process, allowing them to select the optimal algorithm and monitor execution progress.
+
 ### 4.5 Meeting Management
 
 **Meeting Generation:**
@@ -708,6 +676,11 @@ After the scheduler runs, the system:
 - Filtered to their meetings only
 - Shows faculty names, times, event details
 - Only for PUBLISHED events
+
+![Meeting Results](./screenshots/meeting-results.png)
+*Figure 5: Meeting results display showing scheduled student-faculty meetings with clear time and participant information*
+
+The meeting management system provides clear, organized display of all scheduled meetings with role-based access control and intuitive presentation of meeting details.
 
 **Meeting Features:**
 
@@ -792,6 +765,11 @@ Admin User	admin@northwestern.edu	Administration
 - ✅ Reduce data entry errors
 - 📊 Visual validation feedback
 - 🔒 Safe transactions prevent data corruption
+
+![Bulk Upload Interface](./screenshots/bulk-upload-interface.png)
+*Figure 6: Bulk upload interface showing data validation, preview functionality, and import statistics*
+
+The bulk upload system streamlines user management by enabling efficient mass data import with comprehensive validation and error handling.
 
 ---
 
@@ -2304,38 +2282,7 @@ Created comprehensive checklist (`DEPLOYMENT_CHECKLIST.md`):
    - Integration with university student information systems
    - Webhooks for external notifications
 
-### 9.4 Future Roadmap
 
-**Phase 1: Security & Stability (Q1 2026)**
-- Implement bcrypt password hashing
-- Add comprehensive logging
-- Enhance error handling
-- Security audit and penetration testing
-- Performance optimization
-
-**Phase 2: Communication (Q2 2026)**
-- Email notification system
-- Calendar integration (iCal export)
-- SMS reminders (optional)
-- In-app messaging
-
-**Phase 3: Analytics & Reporting (Q3 2026)**
-- Analytics dashboard
-- Custom report builder
-- Data visualization
-- Export functionality
-
-**Phase 4: Advanced Features (Q4 2026)**
-- Mobile application
-- Advanced scheduling options
-- Meeting notes and feedback
-- Integration APIs
-
-**Phase 5: Enterprise Features (2027)**
-- Multi-tenancy support
-- White-label capabilities
-- Advanced SSO integration
-- Enterprise SLA support
 
 ---
 
@@ -2343,7 +2290,7 @@ Created comprehensive checklist (`DEPLOYMENT_CHECKLIST.md`):
 
 ### 10.1 Project Success Summary
 
-The Chronos Academic Meeting Scheduler project successfully achieved its primary objectives of automating and optimizing the complex process of coordinating student-faculty meetings. Through innovative algorithm development, thoughtful user experience design, and robust engineering practices, the system delivers significant value to academic institutions.
+The Chronos Academic Meeting Scheduler project successfully achieved its primary objectives of automating and optimizing the complex process of coordinating student-faculty meetings. Through innovative algorithm development, thoughtful user experience design, and robust engineering practices, the system delivers significant value to Northwestern University.
 
 **Key Accomplishments:**
 
@@ -2445,10 +2392,9 @@ For future development and maintenance of Chronos:
 
 **Long-Term Vision:**
 
-1. **Multi-Institution Support**: Enable SaaS model for multiple universities
-2. **Mobile Applications**: Develop native iOS/Android apps
-3. **Advanced Scheduling**: Support more complex scheduling scenarios
-4. **API Ecosystem**: Build integration APIs for third-party systems
+1. **Mobile Applications**: Develop native iOS/Android apps
+2. **Advanced Scheduling**: Support more complex scheduling scenarios
+3. **API Ecosystem**: Build integration APIs for third-party systems
 
 **Maintenance Recommendations:**
 
@@ -2464,9 +2410,10 @@ For future development and maintenance of Chronos:
 
 I would like to express my sincere gratitude to:
 
-- **Project stakeholders** for their guidance and feedback throughout development
-- **Northwestern University** for the use case and requirements that shaped this project
-- **Open source community** for the excellent tools and frameworks that made this possible
+- **Professor Samir Khuller**, Peter and Adrienne Barris Chair of Computer Science, Professor of Computer Science, Northwestern University, for his guidance and mentorship throughout this project
+- **Ms. Madeleine Agaton**, Senior Graduate Program Coordinator, Department of Computer Science, Northwestern University, for her invaluable support and coordination
+- **Mr. Pred Bundalo**, IT Manager, Northwestern University, for his technical assistance and infrastructure support
+- **Northwestern University** for providing the academic environment and use case that shaped this project
 
 This project represents months of dedicated work, learning, and growth, and I am proud of the results achieved.
 
