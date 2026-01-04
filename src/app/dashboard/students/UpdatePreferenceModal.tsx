@@ -207,44 +207,66 @@ export default function UpdatePreferenceModal({ isOpen, onClose, student }: Prop
     if (!isOpen) return null;
 
     return (
-        <div className="modal-overlay">
-            <div className="modal" style={{ minWidth: 340, maxWidth: 540, minHeight: 900, maxHeight: 1100, overflowY: 'auto' }}>
-                <h2 className="modal-title">Update Preference for {student.name}</h2>
-                {error && <div className="text-red-600 text-sm mb-2 font-semibold">{error}</div>}
-                <div className="form-group">
-                    <label className="form-label">Event</label>
-                    {events.length === 0 ? (
-                        <div className="text-amber-600 bg-amber-50 border border-amber-200 rounded-md p-3 text-sm">
-                            <strong>No events available for input collection.</strong><br />
-                            Events must be in &quot;Collecting Inputs&quot; status for students to provide preferences.
-                        </div>
-                    ) : (
-                        <select className="form-input" value={eventId} onChange={e => setEventId(e.target.value)} required>
-                            <option value="">Select Event</option>
-                            {events.map(ev => (
-                                <option key={ev.id} value={ev.id}>{ev.name} ({typeof ev.date === 'string' ? ev.date.slice(0, 10) : new Date(ev.date).toISOString().slice(0, 10)})</option>
-                            ))}
-                        </select>
-                    )}
+        <div className="modal-overlay" style={{ padding: '20px' }}>
+            <div className="modal" style={{
+                minWidth: 340,
+                maxWidth: 540,
+                maxHeight: '90vh',
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden'
+            }}>
+                <div style={{ flexShrink: 0 }}>
+                    <h2 className="modal-title">Update Preference for {student.name}</h2>
+                    {error && <div className="text-red-600 text-sm mb-2 font-semibold">{error}</div>}
+                    <div className="form-group">
+                        <label className="form-label">Event</label>
+                        {events.length === 0 ? (
+                            <div className="text-amber-600 bg-amber-50 border border-amber-200 rounded-md p-3 text-sm">
+                                <strong>No events available for input collection.</strong><br />
+                                Events must be in &quot;Collecting Inputs&quot; status for students to provide preferences.
+                            </div>
+                        ) : (
+                            <select className="form-input" value={eventId} onChange={e => setEventId(e.target.value)} required>
+                                <option value="">Select Event</option>
+                                {events.map(ev => (
+                                    <option key={ev.id} value={ev.id}>{ev.name} ({typeof ev.date === 'string' ? ev.date.slice(0, 10) : new Date(ev.date).toISOString().slice(0, 10)})</option>
+                                ))}
+                            </select>
+                        )}
+                    </div>
+                    <div className="tabs flex mb-4">
+                        <button
+                            className={`tab-btn flex-1${tab === 'preferences' ? ' active-tab' : ''}`}
+                            type="button"
+                            onClick={() => setTab('preferences')}
+                        >
+                            Select your Professor preference
+                        </button>
+                        <button
+                            className={`tab-btn flex-1${tab === 'slots' ? ' active-tab' : ''}`}
+                            type="button"
+                            onClick={() => setTab('slots')}
+                        >
+                            Available Slots
+                        </button>
+                    </div>
                 </div>
-                <div className="tabs flex mb-4">
-                    <button
-                        className={`tab-btn flex-1${tab === 'preferences' ? ' active-tab' : ''}`}
-                        type="button"
-                        onClick={() => setTab('preferences')}
-                    >
-                        Select your Professor preference
-                    </button>
-                    <button
-                        className={`tab-btn flex-1${tab === 'slots' ? ' active-tab' : ''}`}
-                        type="button"
-                        onClick={() => setTab('slots')}
-                    >
-                        Available Slots
-                    </button>
-                </div>
-                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', minHeight: 700, maxHeight: 900 }}>
-                    <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', overflow: 'visible' }}>
+                <form onSubmit={handleSubmit} style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    flex: 1,
+                    minHeight: 0,
+                    overflow: 'hidden'
+                }}>
+                    <div style={{
+                        flex: 1,
+                        minHeight: 0,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        overflowY: 'auto',
+                        overflowX: 'hidden'
+                    }}>
                         {tab === 'preferences' && (
                             <>
                                 <div className="form-group">
@@ -319,7 +341,7 @@ export default function UpdatePreferenceModal({ isOpen, onClose, student }: Prop
                                             <label htmlFor="selectAllSlots" className="ml-2 font-bold cursor-pointer text-nw-purple" style={{ letterSpacing: 1 }}>Select/Deselect All</label>
                                         </div>
                                         <hr className="mb-2 border-t-2 border-nw-purple" />
-                                        <div className="flex flex-col gap-2 w-full" style={{ maxHeight: 700, overflowY: 'auto' }}>
+                                        <div className="flex flex-col gap-2 w-full">
                                             {allSlots.map((slot: string, idx: number) => (
                                                 <label
                                                     key={slot}
@@ -340,7 +362,7 @@ export default function UpdatePreferenceModal({ isOpen, onClose, student }: Prop
                             </>
                         )}
                     </div>
-                    <div className="modal-actions flex justify-end gap-2 mt-4">
+                    <div className="modal-actions flex justify-end gap-2 mt-4" style={{ flexShrink: 0, paddingTop: '16px' }}>
                         <button type="button" className="secondary-btn" onClick={onClose} disabled={loading}>Cancel</button>
                         <button type="submit" className="primary-btn" disabled={loading}>Save</button>
                     </div>
