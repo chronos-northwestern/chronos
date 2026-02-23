@@ -265,6 +265,7 @@ export default function UpdateAvailabilityModal({ isOpen, onClose, faculty, onSu
                         ))}
                     </div>
                 </div>
+                )}
                 <div style={{ flexShrink: 0, paddingTop: '16px' }}>
                     {error && <div className="text-red-600 text-sm mb-2">{error}</div>}
                     <div className="modal-actions flex justify-end gap-2 mt-4">
