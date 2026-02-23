@@ -166,10 +166,18 @@ export default function UpdateAvailabilityModal({ isOpen, onClose, faculty, onSu
     if (!isOpen) return null;
 
     return (
-        <div className="modal-overlay">
-            <div className="modal" style={{ minWidth: 360, maxWidth: 540, minHeight: 700, maxHeight: 900, background: 'var(--northwestern-surface)' }}>
-                <h2 className="modal-title mb-4">Update Availability for <span className="text-nw-purple font-semibold">{faculty.name}</span></h2>
-                <div className="space-y-4">
+        <div className="modal-overlay" style={{ padding: '20px' }}>
+            <div className="modal" style={{
+                minWidth: 360,
+                maxWidth: 540,
+                maxHeight: '90vh',
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden',
+                background: 'var(--northwestern-surface)'
+            }}>
+                <div style={{ flexShrink: 0 }}>
+                    <h2 className="modal-title mb-4">Update Availability for <span className="text-nw-purple font-semibold">{faculty.name}</span></h2>
                     <div className="form-group">
                         <label className="form-label font-bold">Select Event</label>
                         {events.length === 0 ? (
@@ -228,26 +236,36 @@ export default function UpdateAvailabilityModal({ isOpen, onClose, faculty, onSu
                                         <label htmlFor="selectAllSlots" className="ml-2 font-bold cursor-pointer text-nw-purple" style={{ letterSpacing: 1 }}>Select/Deselect All</label>
                                     </div>
                                     <hr className="mb-2 border-t-2 border-nw-purple" />
-                                    <div className="flex flex-col gap-2 w-full" style={{ maxHeight: 500, overflowY: 'auto' }}>
-                                        {allSlots.map((slot: string, idx: number) => (
-                                            <label
-                                                key={slot}
-                                                className={`flex items-center gap-2 px-3 py-2 rounded w-full ${idx % 2 === 0 ? 'bg-gray-100 dark:bg-gray-700' : 'bg-purple-50 dark:bg-gray-800'}`}
-                                                style={{ marginBottom: 4, display: 'block', border: '1px solid #e5e7eb' }}
-                                            >
-                                                <input
-                                                    type="checkbox"
-                                                    checked={availableSlots.includes(slot)}
-                                                    onChange={() => handleSlotToggle(slot)}
-                                                />
-                                                <span>{slot}</span>
-                                            </label>
-                                        ))}
-                                    </div>
                                 </div>
                             </div>
                         </>
                     )}
+                </div>
+                {eventId && (
+                    <div style={{
+                        flex: 1,
+                        minHeight: 0,
+                        overflowY: 'auto',
+                        overflowX: 'hidden'
+                    }}>
+                    <div className="flex flex-col gap-2 w-full">
+                        {allSlots.map((slot: string, idx: number) => (
+                            <label
+                                key={slot}
+                                className={`flex items-center gap-2 px-3 py-2 rounded w-full ${idx % 2 === 0 ? 'bg-gray-100 dark:bg-gray-700' : 'bg-purple-50 dark:bg-gray-800'}`}
+                                style={{ marginBottom: 4, display: 'block', border: '1px solid #e5e7eb' }}
+                            >
+                                <input
+                                    type="checkbox"
+                                    checked={availableSlots.includes(slot)}
+                                    onChange={() => handleSlotToggle(slot)}
+                                />
+                                <span>{slot}</span>
+                            </label>
+                        ))}
+                    </div>
+                </div>
+                <div style={{ flexShrink: 0, paddingTop: '16px' }}>
                     {error && <div className="text-red-600 text-sm mb-2">{error}</div>}
                     <div className="modal-actions flex justify-end gap-2 mt-4">
                         <button type="button" className="secondary-btn" onClick={onClose} disabled={loading}>Cancel</button>
