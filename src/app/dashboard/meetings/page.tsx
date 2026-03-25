@@ -24,51 +24,56 @@ async function getMeetings(user: User, latestRunId: number | null) {
     let result;
     if (user && user.role === 'student' && latestRunId) {
         result = await client.query(`
-            SELECT m.*, e.name as event_name, u1.name as faculty_name, u1.email as faculty_email, u2.name as student_name, u2.email as student_email
+            SELECT m.*, e.name as event_name, u1.name as faculty_name, u1.email as faculty_email, u2.name as student_name, u2.email as student_email, a.building, a.room_number
             FROM meetings m
             JOIN events e ON m.event_id = e.id
             JOIN users u1 ON m.faculty_id = u1.id
             JOIN users u2 ON m.student_id = u2.id
+            LEFT JOIN availabilities a ON m.faculty_id = a.faculty_id AND m.event_id = a.event_id
             WHERE m.student_id = $1 AND m.run_id = $2 AND e.status = 'PUBLISHED'
             ORDER BY m.start_time, m.event_id
         `, [user.userId || user.id, latestRunId]);
     } else if (user && user.role === 'student') {
         result = await client.query(`
-            SELECT m.*, e.name as event_name, u1.name as faculty_name, u1.email as faculty_email, u2.name as student_name, u2.email as student_email
+            SELECT m.*, e.name as event_name, u1.name as faculty_name, u1.email as faculty_email, u2.name as student_name, u2.email as student_email, a.building, a.room_number
             FROM meetings m
             JOIN events e ON m.event_id = e.id
             JOIN users u1 ON m.faculty_id = u1.id
             JOIN users u2 ON m.student_id = u2.id
+            LEFT JOIN availabilities a ON m.faculty_id = a.faculty_id AND m.event_id = a.event_id
             WHERE m.student_id = $1 AND e.status = 'PUBLISHED'
             ORDER BY m.start_time, m.event_id
         `, [user.userId || user.id]);
     } else if (user && user.role === 'faculty' && latestRunId) {
         result = await client.query(`
-            SELECT m.*, e.name as event_name, u1.name as faculty_name, u1.email as faculty_email, u2.name as student_name, u2.email as student_email
+            SELECT m.*, e.name as event_name, u1.name as faculty_name, u1.email as faculty_email, u2.name as student_name, u2.email as student_email, a.building, a.room_number
             FROM meetings m
             JOIN events e ON m.event_id = e.id
             JOIN users u1 ON m.faculty_id = u1.id
             JOIN users u2 ON m.student_id = u2.id
+            LEFT JOIN availabilities a ON m.faculty_id = a.faculty_id AND m.event_id = a.event_id
             WHERE m.faculty_id = $1 AND m.run_id = $2 AND e.status = 'PUBLISHED'
             ORDER BY m.start_time, m.event_id
         `, [user.userId || user.id, latestRunId]);
     } else if (user && user.role === 'faculty') {
         result = await client.query(`
-            SELECT m.*, e.name as event_name, u1.name as faculty_name, u1.email as faculty_email, u2.name as student_name, u2.email as student_email
+            SELECT m.*, e.name as event_name, u1.name as faculty_name, u1.email as faculty_email, u2.name as student_name, u2.email as student_email, a.building, a.room_number
             FROM meetings m
             JOIN events e ON m.event_id = e.id
             JOIN users u1 ON m.faculty_id = u1.id
             JOIN users u2 ON m.student_id = u2.id
+            LEFT JOIN availabilities a ON m.faculty_id = a.faculty_id AND m.event_id = a.event_id
             WHERE m.faculty_id = $1 AND e.status = 'PUBLISHED'
             ORDER BY m.start_time, m.event_id
         `, [user.userId || user.id]);
     } else {
         result = await client.query(`
-            SELECT m.*, e.name as event_name, u1.name as faculty_name, u1.email as faculty_email, u2.name as student_name, u2.email as student_email
+            SELECT m.*, e.name as event_name, u1.name as faculty_name, u1.email as faculty_email, u2.name as student_name, u2.email as student_email, a.building, a.room_number
             FROM meetings m
             JOIN events e ON m.event_id = e.id
             JOIN users u1 ON m.faculty_id = u1.id
             JOIN users u2 ON m.student_id = u2.id
+            LEFT JOIN availabilities a ON m.faculty_id = a.faculty_id AND m.event_id = a.event_id
             ORDER BY m.start_time, m.event_id
         `);
     }

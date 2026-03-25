@@ -23,6 +23,8 @@ interface Meeting {
     professor_id?: string;
     professor_name?: string;
     run_id?: number; // Added run_id to the interface
+    building?: string;
+    room_number?: string;
 }
 
 interface User { id: string; name: string; }
@@ -189,9 +191,13 @@ export default function MeetingsTabsClient({ meetings, professors, students, eve
             'Run ID': m.run_id ?? '',
             Event: m.event_name,
             Faculty: m.faculty_name,
+            'Faculty Email': m.faculty_email,
             Attendee: m.student_name,
+            'Attendee Email': m.student_email,
             Date: formatDate(m.start_time),
             Slot: formatSlot(m.start_time, m.end_time),
+            Building: m.building ?? '',
+            Room: m.room_number ?? '',
         }));
         if (exportData.length === 0) return;
         const headers = Object.keys(exportData[0]);
