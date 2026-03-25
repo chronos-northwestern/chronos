@@ -12,6 +12,8 @@ export interface Availability {
     start_time: string;
     end_time: string;
     available_slots: string[];
+    building?: string;
+    room_number?: string;
     updated_at: string;
 }
 
@@ -60,12 +62,14 @@ export default function AvailabilitiesTableClient({ availabilities }: { availabi
                         <th>Email</th>
                         <th>Event</th>
                         <th>Event Date</th>
+                        <th>Building</th>
+                        <th>Room</th>
                         <th>Available Slots</th>
                     </tr>
                 </thead>
                 <tbody>
                     {filtered.length === 0 ? (
-                        <tr><td colSpan={5}>No availabilities found.</td></tr>
+                        <tr><td colSpan={7}>No availabilities found.</td></tr>
                     ) : (
                         filtered.map(a => (
                             <tr key={a.id}>
@@ -73,6 +77,8 @@ export default function AvailabilitiesTableClient({ availabilities }: { availabi
                                 <td>{a.faculty_email}</td>
                                 <td>{a.event_name}</td>
                                 <td>{typeof a.event_date === 'string' && a.event_date ? a.event_date.slice(0, 10) : '-'}</td>
+                                <td>{a.building || '-'}</td>
+                                <td>{a.room_number || '-'}</td>
                                 <td>{Array.isArray(a.available_slots) ? a.available_slots.join(", ") : a.available_slots}</td>
                             </tr>
                         ))

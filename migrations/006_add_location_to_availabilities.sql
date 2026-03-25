@@ -1,0 +1,2 @@
+ALTER TABLE availabilities ADD COLUMN IF NOT EXISTS building VARCHAR(255);
+ALTER TABLE availabilities ADD COLUMN IF NOT EXISTS room_number VARCHAR(50);

@@ -69,6 +69,9 @@ export default function UpdateAvailabilityModal({ isOpen, onClose, faculty, onSu
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [availableSlots, setAvailableSlots] = useState<string[]>([]);
+    const [building, setBuilding] = useState("");
+    const [roomNumber, setRoomNumber] = useState("");
+    const [facultyAvailMap, setFacultyAvailMap] = useState<Record<string, { building?: string; room_number?: string }>>({});
     const selectAllRef = useRef<HTMLInputElement>(null);
 
     // Fetch events every time modal opens to get latest slot configuration
@@ -85,11 +88,11 @@ export default function UpdateAvailabilityModal({ isOpen, onClose, faculty, onSu
         async function fetchAvailabilities() {
             if (isOpen && faculty.id) {
                 const allAvail = await getAllAvailabilitiesForFaculty(faculty.id);
-                const availMap: Record<string, string[]> = {};
+                const locMap: Record<string, { building?: string; room_number?: string }> = {};
                 for (const row of allAvail) {
-                    availMap[row.event_id] = Array.isArray(row.unavailable_slots) ? row.unavailable_slots : [];
+                    locMap[row.event_id] = { building: row.building || "", room_number: row.room_number || "" };
                 }
-                // setFacultyAvailabilities(availMap); // This line is removed
+                setFacultyAvailMap(locMap);
             }
         }
         fetchAvailabilities();
@@ -142,6 +145,17 @@ export default function UpdateAvailabilityModal({ isOpen, onClose, faculty, onSu
         }
     }, [availableSlots, allSlots]);
 
+    // Load building/room when event changes
+    useEffect(() => {
+        if (eventId && facultyAvailMap[eventId]) {
+            setBuilding(facultyAvailMap[eventId].building || "");
+            setRoomNumber(facultyAvailMap[eventId].room_number || "");
+        } else {
+            setBuilding("");
+            setRoomNumber("");
+        }
+    }, [eventId, facultyAvailMap]);
+
     useEffect(() => {
         if (isOpen) {
             setStartTime("");
@@ -159,7 +173,7 @@ export default function UpdateAvailabilityModal({ isOpen, onClose, faculty, onSu
     function handleSave() {
         if (!eventId) return;
         setLoading(true);
-        upsertAvailability({ facultyId: faculty.id, eventId, slots: availableSlots, preferences: "" })
+        upsertAvailability({ facultyId: faculty.id, eventId, slots: availableSlots, preferences: "", building: building.trim() || undefined, roomNumber: roomNumber.trim() || undefined })
             .then(() => {
                 setLoading(false);
                 onSubmit({ eventId, slots: availableSlots, preferences: "" });
@@ -213,6 +227,28 @@ export default function UpdateAvailabilityModal({ isOpen, onClose, faculty, onSu
                                 <div className="flex flex-col md:flex-row md:items-center md:gap-6 text-sm text-gray-700 dark:text-gray-200">
                                     <div><b>Event Timings:</b> {formatTime12h(startTime)} - {formatTime12h(endTime)}</div>
                                     <div><b>Slot Length:</b> {slotLen} min</div>
+                                </div>
+                            </div>
+                            <div className="flex flex-col md:flex-row md:gap-4 mt-2 mb-2">
+                                <div className="form-group flex-1">
+                                    <label className="form-label font-bold">Building <span className="text-gray-400 font-normal">(optional)</span></label>
+                                    <input
+                                        type="text"
+                                        className="form-input rounded-md border-gray-300 focus:border-nw-purple focus:ring-nw-purple"
+                                        placeholder="e.g. Tech Institute"
+                                        value={building}
+                                        onChange={e => setBuilding(e.target.value)}
+                                    />
+                                </div>
+                                <div className="form-group flex-1">
+                                    <label className="form-label font-bold">Room Number <span className="text-gray-400 font-normal">(optional)</span></label>
+                                    <input
+                                        type="text"
+                                        className="form-input rounded-md border-gray-300 focus:border-nw-purple focus:ring-nw-purple"
+                                        placeholder="e.g. L361"
+                                        value={roomNumber}
+                                        onChange={e => setRoomNumber(e.target.value)}
+                                    />
                                 </div>
                             </div>
                             <div className="timezone-notice" style={{
