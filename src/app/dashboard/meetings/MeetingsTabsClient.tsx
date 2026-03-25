@@ -186,6 +186,7 @@ export default function MeetingsTabsClient({ meetings, professors, students, eve
 
     function handleExportExcel() {
         const exportData = filteredMeetings.map(m => ({
+            'Run ID': m.run_id ?? '',
             Event: m.event_name,
             Faculty: m.faculty_name,
             Attendee: m.student_name,
