@@ -97,28 +97,36 @@ export default function UpdateAvailabilityModal({ isOpen, onClose, faculty, onSu
 
     useEffect(() => {
         if (!eventId) return;
-        const ev = (events as unknown[]).find(e => (e as { id: string }).id === eventId) as { slot_len?: number; start_time?: string; end_time?: string; available_slots?: string[] | string } | undefined;
+        const ev = (events as unknown[]).find(e => (e as { id: string }).id === eventId) as { slot_len?: number; start_time?: string; end_time?: string; available_slots?: string[] | string | { slots?: string[] } } | undefined;
         if (ev) {
             setSlotLen(ev.slot_len ?? 30);
             setStartTime(ev.start_time ?? "");
             setEndTime(ev.end_time ?? "");
             let slotsFromEvent: string[] = [];
-            if (ev.available_slots && ev.available_slots.length > 0) {
-                let ranges: string[] = [];
+            let ranges: string[] = [];
+
+            if (ev.available_slots) {
                 if (typeof ev.available_slots === 'string') {
                     try {
                         const parsed = JSON.parse(ev.available_slots);
                         if (parsed && typeof parsed === 'object' && Array.isArray(parsed.slots)) {
                             ranges = parsed.slots;
-                        } else {
-                            ranges = [];
                         }
                     } catch {
-                        ranges = [];
+                        // If parsing fails, try old comma-separated format
+                        ranges = ev.available_slots.split(',').map((s: string) => s.trim()).filter(Boolean);
                     }
-                } else {
+                } else if (typeof ev.available_slots === 'object' && ev.available_slots !== null) {
+                    const slotsObj = ev.available_slots as { slots?: string[] };
+                    if (Array.isArray(slotsObj.slots)) {
+                        ranges = slotsObj.slots;
+                    }
+                } else if (Array.isArray(ev.available_slots)) {
                     ranges = ev.available_slots;
                 }
+            }
+
+            if (ranges.length > 0) {
                 slotsFromEvent = getSlotsFromRanges(ranges, slotLen);
             } else {
                 slotsFromEvent = getTimeSlots(ev.start_time ?? '', ev.end_time ?? '', ev.slot_len ?? slotLen);
