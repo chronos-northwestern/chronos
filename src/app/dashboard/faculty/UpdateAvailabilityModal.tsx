@@ -71,14 +71,14 @@ export default function UpdateAvailabilityModal({ isOpen, onClose, faculty, onSu
     const [availableSlots, setAvailableSlots] = useState<string[]>([]);
     const selectAllRef = useRef<HTMLInputElement>(null);
 
-    // Prefetch events that are collecting inputs on mount (not just when modal opens)
+    // Fetch events every time modal opens to get latest slot configuration
     useEffect(() => {
         async function fetchEvents() {
             const eventsData = await getEventsForInputCollection();
             setEvents(eventsData);
         }
-        fetchEvents();
-    }, []);
+        if (isOpen) fetchEvents();
+    }, [isOpen]);
 
     // Prefetch all availabilities for this faculty when modal opens
     useEffect(() => {
